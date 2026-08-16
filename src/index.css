@@ -42,4 +42,132 @@
     border-radius: inherit;
     background: linear-gradient(135deg, #2170e4, #6063ee);
   }
+
+  /* EduAI Copilot Custom Animations */
+  .copilot-slide-in {
+    animation: copilotSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .copilot-slide-out {
+    animation: copilotSlideOut 0.25s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  }
+
+  .copilot-fade-up {
+    animation: copilotFadeUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .copilot-scale-in {
+    animation: copilotScaleIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .copilot-glow-pulse {
+    animation: copilotSoftGlow 3s infinite ease-in-out;
+  }
+
+  .copilot-badge-pulse {
+    animation: copilotBadgePulse 2s infinite ease-in-out;
+  }
+
+  .copilot-dot-1 {
+    animation: copilotDotPulse 1.2s infinite ease-in-out;
+    animation-delay: 0s;
+  }
+  .copilot-dot-2 {
+    animation: copilotDotPulse 1.2s infinite ease-in-out;
+    animation-delay: 0.2s;
+  }
+  .copilot-dot-3 {
+    animation: copilotDotPulse 1.2s infinite ease-in-out;
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes copilotSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes copilotSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.98);
+  }
+}
+
+@keyframes copilotFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes copilotScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes copilotDotPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes copilotSoftGlow {
+  0%, 100% {
+    box-shadow: 0 8px 24px -4px rgba(70, 72, 212, 0.35);
+  }
+  50% {
+    box-shadow: 0 12px 32px 2px rgba(70, 72, 212, 0.55);
+  }
+}
+
+@keyframes copilotBadgePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copilot-slide-in,
+  .copilot-slide-out,
+  .copilot-fade-up,
+  .copilot-scale-in,
+  .copilot-glow-pulse,
+  .copilot-badge-pulse,
+  .copilot-dot-1,
+  .copilot-dot-2,
+  .copilot-dot-3 {
+    animation: none !important;
+    transition: none !important;
+  }
 }

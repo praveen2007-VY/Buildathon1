@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/common/Sidebar';
 import { Header } from '../components/common/Header';
 import { AlertCircle, X } from 'lucide-react';
+import { EduAICopilot } from '../components/ai/EduAICopilot';
 
 export const StudentLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,6 +47,9 @@ export const StudentLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Global AI Copilot */}
+      <EduAICopilot />
     </div>
   );
 };

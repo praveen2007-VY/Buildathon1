@@ -12,7 +12,15 @@ import { gradesRouter } from './routes/grades.js';
 import { aiRouter } from './routes/ai.js';
 import { statsRouter } from './routes/stats.js';
 import { systemRouter } from './routes/system.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from workspace root and server/ directory
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config();
 
 const app = express();

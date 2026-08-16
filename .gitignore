@@ -13,9 +13,14 @@ dist/
 dist-ssr/
 *.local
 
+# Environment files
+.env
+.env.*
+.env.local
+server/.env
+
 # Editor & System Files
 .vscode/*
-!.vscode/extensions.json
 .idea/
 .DS_Store
 *.suo
