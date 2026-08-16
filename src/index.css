@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .ai-gradient {
+    background: linear-gradient(135deg, rgba(33, 112, 228, 0.08) 0%, rgba(96, 99, 238, 0.12) 100%);
+    border: 1px solid rgba(96, 99, 238, 0.25);
+  }
+
+  .ai-gradient-text {
+    background: linear-gradient(135deg, #0058be 0%, #4648d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .ai-gradient-border {
+    position: relative;
+    background: #ffffff;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+  }
+  .ai-gradient-border::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #2170e4, #6063ee);
+  }
+}
