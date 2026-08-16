@@ -134,6 +134,10 @@ class ApiClient {
     });
   }
 
+  async getStudentCourses() {
+    return this.request<{ courses: CourseProgressItem[] }>('/courses/student');
+  }
+
   // ==================== CLASSES ====================
   async getClasses(filters: { instructor?: string; courseCode?: string } = {}) {
     const params = new URLSearchParams();
@@ -262,11 +266,19 @@ class ApiClient {
     });
   }
 
+  async submitTestResult(data: { title: string; subject: string; score: number; totalQuestions: number; testType: 'graded' | 'practice' }) {
+    return this.request<{ success: boolean; exam: StudentExam }>('/exams/submit', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // ==================== GRADES ====================
   async getStudentGrades() {
     return this.request<{
       summary: { currentGPA: number; percentage: number; totalCredits: number; completedSubjects: number };
       records: StudentGradeRecord[];
+      grades: StudentGradeRecord[];
       semesterPerformance: { month: string; score: number; target: number }[];
     }>('/grades/student');
   }

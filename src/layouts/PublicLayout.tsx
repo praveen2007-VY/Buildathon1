@@ -10,7 +10,6 @@ export const PublicLayout: React.FC = () => {
 
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Courses', path: '/courses' },
     { label: 'Contact', path: '/contact' },
   ];
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   UserCheck, 
@@ -7,17 +7,35 @@ import {
   Calendar, 
   Download, 
   TrendingUp, 
-  TrendingDown, 
   Minus 
 } from 'lucide-react';
-import { adminStats } from '../../data/mockData';
-import { AcademicPerformanceChart } from '../../components/charts/AcademicPerformanceChart';
 import { AcademicRiskDonutChart } from '../../components/charts/AcademicRiskDonutChart';
-import { DepartmentPerformanceBarChart } from '../../components/charts/DepartmentPerformanceBarChart';
 import { InstitutionalAIInsightCard } from '../../components/admin/InstitutionalAIInsightCard';
 import { SystemMonitoringWidget } from '../../components/admin/SystemMonitoringWidget';
+import { api } from '../../services/api';
 
 export const AdminDashboard: React.FC = () => {
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalTeachers: 0,
+    activeCourses: 0,
+    globalAttendance: 0
+  });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await api.getAdminStats();
+        if (res.stats) {
+          setStats(res.stats);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadStats();
+  }, []);
+
   return (
     <div className="space-y-lg max-w-7xl mx-auto pb-8">
       {/* Page Header */}
@@ -27,14 +45,14 @@ export const AdminDashboard: React.FC = () => {
             Institutional Overview
           </h2>
           <p className="font-body text-[14px] leading-[20px] text-on-surface-variant mt-1">
-            Fall Semester 2024 Summary
+            System Academic Summary
           </p>
         </div>
 
         <div className="flex gap-3">
           <button className="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg font-label text-[12px] font-medium hover:bg-surface-container-low transition-colors shadow-xs cursor-pointer">
             <Calendar className="w-4 h-4" />
-            <span>This Semester</span>
+            <span>Academic Term</span>
           </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label text-[12px] font-medium hover:bg-primary/90 transition-colors shadow-sm cursor-pointer">
             <Download className="w-4 h-4" />
@@ -57,11 +75,11 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="font-headline text-[24px] md:text-[32px] font-bold text-on-surface">
-              {adminStats.totalStudents.toLocaleString()}
+              {stats.totalStudents}
             </div>
             <div className="flex items-center gap-1 mt-1 text-tertiary font-label text-[12px]">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>{adminStats.studentsTrend}</span>
+              <span>Registered</span>
             </div>
           </div>
         </div>
@@ -78,11 +96,11 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="font-headline text-[24px] md:text-[32px] font-bold text-on-surface">
-              {adminStats.totalTeachers}
+              {stats.totalTeachers}
             </div>
             <div className="flex items-center gap-1 mt-1 text-outline font-label text-[12px]">
               <Minus className="w-3.5 h-3.5" />
-              <span>{adminStats.teachersTrend}</span>
+              <span>Active Faculty</span>
             </div>
           </div>
         </div>
@@ -99,11 +117,11 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="font-headline text-[24px] md:text-[32px] font-bold text-on-surface">
-              {adminStats.activeCourses}
+              {stats.activeCourses}
             </div>
             <div className="flex items-center gap-1 mt-1 text-tertiary font-label text-[12px]">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>{adminStats.coursesTrend}</span>
+              <span>In Session</span>
             </div>
           </div>
         </div>
@@ -120,30 +138,28 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="font-headline text-[24px] md:text-[32px] font-bold text-on-surface">
-              {adminStats.globalAttendance}%
+              {stats.globalAttendance}%
             </div>
-            <div className="flex items-center gap-1 mt-1 text-error font-label text-[12px]">
-              <TrendingDown className="w-3.5 h-3.5" />
-              <span>{adminStats.attendanceTrend}</span>
+            <div className="flex items-center gap-1 mt-1 text-tertiary font-label text-[12px]">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Overall Rate</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Grid 1: Academic Performance & Risk */}
+      {/* Institutional AI Insights & Risk Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
-        <AcademicPerformanceChart />
-        <AcademicRiskDonutChart />
+        <div className="lg:col-span-8">
+          <InstitutionalAIInsightCard />
+        </div>
+        <div className="lg:col-span-4">
+          <AcademicRiskDonutChart />
+        </div>
       </div>
 
-      {/* Institutional AI Insights */}
-      <InstitutionalAIInsightCard />
-
-      {/* Main Grid 2: Department Performance & System Monitoring */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
-        <DepartmentPerformanceBarChart />
-        <SystemMonitoringWidget />
-      </div>
+      {/* System Monitoring */}
+      <SystemMonitoringWidget />
     </div>
   );
 };

@@ -79,6 +79,71 @@ examsRouter.put('/:id', authenticate, requireRole('teacher', 'admin'), (req: Aut
   res.json({ exam: updated });
 });
 
+// SUBMIT test results (Student)
+examsRouter.post('/submit', authenticate, (req: AuthRequest, res: Response): void => {
+  const { title, subject, score, totalQuestions, testType } = req.body;
+  if (!title || !subject || score === undefined || !totalQuestions) {
+    res.status(400).json({ error: 'Title, subject, score, and totalQuestions are required.' });
+    return;
+  }
+
+  const percentage = Math.round((Number(score) / Number(totalQuestions)) * 100);
+  let grade = 'F';
+  if (percentage >= 90) grade = 'A';
+  else if (percentage >= 80) grade = 'B';
+  else if (percentage >= 70) grade = 'C';
+  else if (percentage >= 60) grade = 'D';
+
+  const result = percentage >= 60 ? 'Passed' : 'Needs Practice';
+
+  const id = `ex_${Date.now()}`;
+  const newExamRecord: StudentExam = {
+    id,
+    title,
+    subject,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    time: 'Completed',
+    duration: 'Completed',
+    location: testType === 'practice' ? 'Practice Portal' : 'Online Assessment',
+    isUpcoming: false,
+    score: `${score}/${totalQuestions}`,
+    grade,
+    result,
+    instructor: 'System Evaluator',
+    maxMarks: totalQuestions
+  };
+
+  db.insert('exams', newExamRecord);
+
+  // Insert grade record for student
+  db.insert('grades', {
+    id: `grd_${Date.now()}`,
+    subject,
+    code: subject.split(' ')[0] || 'TEST',
+    instructor: 'System Evaluator',
+    credits: 3,
+    score: percentage,
+    letterGrade: grade,
+    status: result,
+    studentId: req.user?.id
+  });
+
+  // Log activity
+  db.insert('systemLogs', {
+    id: `log_${Date.now()}`,
+    title: `Test Completed: ${title} (${percentage}%)`,
+    time: 'Just now',
+    source: 'Analytics Portal',
+    type: 'user',
+    userRole: req.user?.role || 'student',
+    action: 'Complete Test',
+    module: 'Exams',
+    status: 'Success'
+  });
+
+  res.status(201).json({ success: true, exam: newExamRecord });
+});
+
 // DELETE exam
 examsRouter.delete('/:id', authenticate, requireRole('teacher', 'admin'), (req: AuthRequest, res: Response): void => {
   const { id } = req.params;

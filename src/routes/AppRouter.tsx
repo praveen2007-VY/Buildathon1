@@ -9,7 +9,6 @@ import { AdminLayout } from '../layouts/AdminLayout';
 
 // Public Pages
 import { Home } from '../pages/public/Home';
-import { Courses } from '../pages/public/Courses';
 import { CourseDetails } from '../pages/public/CourseDetails';
 import { Contact } from '../pages/public/Contact';
 import { Login } from '../pages/public/Login';
@@ -35,7 +34,6 @@ import { AttendanceManagement } from '../pages/teacher/AttendanceManagement';
 import { TeacherAssignments } from '../pages/teacher/TeacherAssignments';
 import { TeacherExams } from '../pages/teacher/TeacherExams';
 import { TeacherGrades } from '../pages/teacher/TeacherGrades';
-import { StudentPerformance } from '../pages/teacher/StudentPerformance';
 import { TeacherAIInsights } from '../pages/teacher/TeacherAIInsights';
 import { TeacherProfile } from '../pages/teacher/TeacherProfile';
 
@@ -62,8 +60,9 @@ export const AppRouter: React.FC = () => {
         {/* Public Routes */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
-          <Route path="courses" element={<Courses />} />
-          <Route path="courses/:id" element={<CourseDetails />} />
+          {/* Direct legacy public course routes to protected student course hub */}
+          <Route path="courses" element={<Navigate to="/student/courses" replace />} />
+          <Route path="courses/:id" element={<Navigate to="/student/courses" replace />} />
           <Route path="contact" element={<Contact />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
@@ -73,13 +72,14 @@ export const AppRouter: React.FC = () => {
         <Route 
           path="/student" 
           element={
-            <ProtectedRoute allowedRoles={['student', 'admin']}>
+            <ProtectedRoute allowedRoles={['student']}>
               <StudentLayout />
             </ProtectedRoute>
           }
         >
           <Route index element={<StudentDashboard />} />
           <Route path="courses" element={<MyCourses />} />
+          <Route path="courses/:id" element={<CourseDetails />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="exams" element={<Exams />} />
@@ -94,7 +94,7 @@ export const AppRouter: React.FC = () => {
         <Route 
           path="/teacher" 
           element={
-            <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherLayout />
             </ProtectedRoute>
           }
@@ -106,7 +106,6 @@ export const AppRouter: React.FC = () => {
           <Route path="assignments" element={<TeacherAssignments />} />
           <Route path="exams" element={<TeacherExams />} />
           <Route path="grades" element={<TeacherGrades />} />
-          <Route path="students" element={<StudentPerformance />} />
           <Route path="ai" element={<TeacherAIInsights />} />
           <Route path="profile" element={<TeacherProfile />} />
         </Route>

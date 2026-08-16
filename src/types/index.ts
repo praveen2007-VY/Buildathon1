@@ -239,7 +239,7 @@ export interface StudentExam {
   isUpcoming: boolean;
   score?: string;
   grade?: string;
-  result?: 'Pass' | 'Fail' | 'Distinction';
+  result?: 'Passed' | 'Needs Practice' | 'Pass' | 'Fail' | 'Distinction';
   instructions?: string[];
   maxMarks?: number;
   instructor?: string;
@@ -250,12 +250,13 @@ export interface StudentGradeRecord {
   id: string;
   subject: string;
   code: string;
-  assessment: string;
+  assessment?: string;
   score: number;
-  maxScore: number;
-  grade: string;
-  status: 'Pass' | 'Fail' | 'Pending';
-  semester: string;
+  maxScore?: number;
+  grade?: string;
+  letterGrade?: string;
+  status?: 'Pass' | 'Fail' | 'Passed' | 'Needs Practice' | 'Pending' | string;
+  semester?: string;
   department?: string;
   studentName?: string;
   studentId?: string;

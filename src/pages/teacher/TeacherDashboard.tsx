@@ -1,21 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, BookOpen, Clock, UserCheck } from 'lucide-react';
-import { teacherStats, currentUserTeacher } from '../../data/mockData';
-import { TeacherPerformanceChart } from '../../components/charts/TeacherPerformanceChart';
 import { TeacherAIInsightsCard } from '../../components/ai/TeacherAIInsightsCard';
 import { ActiveCoursesList } from '../../components/teacher/ActiveCoursesList';
 import { AtRiskStudentsTable } from '../../components/tables/AtRiskStudentsTable';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 export const TeacherDashboard: React.FC = () => {
+  const { user } = useAuth();
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    activeCourses: 0,
+    pendingEvaluations: 0,
+    attendanceTodayPercentage: 0
+  });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await api.getTeacherStats();
+        if (res.stats) {
+          setStats(res.stats);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadStats();
+  }, []);
+
   return (
     <div className="space-y-lg max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-lg">
         <h2 className="font-headline text-[24px] leading-[32px] md:text-[32px] md:leading-[40px] font-bold text-on-surface">
-          Welcome back, {currentUserTeacher.name}
+          Welcome back, {user?.name || 'Faculty Professor'}
         </h2>
         <p className="font-body text-[16px] leading-[24px] text-on-surface-variant mt-1">
-          Here is your academic overview for today, October 24.
+          Here is your academic overview for today.
         </p>
       </div>
 
@@ -33,7 +55,7 @@ export const TeacherDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-sm">
             <span className="font-display text-[32px] md:text-[48px] leading-[40px] md:leading-[60px] font-bold text-on-surface">
-              {teacherStats.totalStudents}
+              {stats.totalStudents}
             </span>
           </div>
         </div>
@@ -50,7 +72,7 @@ export const TeacherDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-sm">
             <span className="font-display text-[32px] md:text-[48px] leading-[40px] md:leading-[60px] font-bold text-on-surface">
-              {teacherStats.activeCourses}
+              {stats.activeCourses}
             </span>
           </div>
         </div>
@@ -67,7 +89,7 @@ export const TeacherDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-sm">
             <span className="font-display text-[32px] md:text-[48px] leading-[40px] md:leading-[60px] font-bold text-on-surface">
-              {teacherStats.pendingEvaluations}
+              {stats.pendingEvaluations}
             </span>
           </div>
         </div>
@@ -84,20 +106,15 @@ export const TeacherDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-sm">
             <span className="font-display text-[32px] md:text-[48px] leading-[40px] md:leading-[60px] font-bold text-on-surface">
-              {teacherStats.attendanceTodayPercentage}%
+              {stats.attendanceTodayPercentage}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* Middle Section: Chart & AI Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-        <div className="lg:col-span-2">
-          <TeacherPerformanceChart />
-        </div>
-        <div className="lg:col-span-1">
-          <TeacherAIInsightsCard />
-        </div>
+      {/* Middle Section: AI Insights */}
+      <div className="grid grid-cols-1 gap-lg">
+        <TeacherAIInsightsCard />
       </div>
 
       {/* Bottom Section: Active Courses & At-Risk Students */}

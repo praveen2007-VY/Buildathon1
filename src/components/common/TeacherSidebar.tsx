@@ -29,7 +29,6 @@ export const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isOpen = true, o
     { label: 'Assignments', path: '/teacher/assignments', icon: FileText },
     { label: 'Exams', path: '/teacher/exams', icon: HelpCircle },
     { label: 'Grades', path: '/teacher/grades', icon: Award },
-    { label: 'Student Performance', path: '/teacher/students', icon: BarChart3 },
     { label: 'AI Insights', path: '/teacher/ai', icon: Sparkles, isAI: true },
     { label: 'Profile', path: '/teacher/profile', icon: UserIcon },
   ];

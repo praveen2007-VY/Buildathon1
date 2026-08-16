@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { User as UserIcon, Mail, Phone, Edit3, Save, X, CheckCircle2 } from 'lucide-react';
-import { currentUserAdmin } from '../../data/mockData';
+import { Edit3, Save, X, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const AdminProfile: React.FC = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUserAdmin.name);
-  const [email, setEmail] = useState(currentUserAdmin.email);
+  const [name, setName] = useState(user?.name || 'System Administrator');
+  const [email, setEmail] = useState(user?.email || 'admin@eduai.edu');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    updateUser({ name, email });
     setIsEditing(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -65,19 +67,17 @@ export const AdminProfile: React.FC = () => {
 
       {/* Main Avatar & Card */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card flex flex-col md:flex-row items-center md:items-start gap-lg">
-        <img 
-          src={currentUserAdmin.avatar} 
-          alt={currentUserAdmin.name} 
-          className="w-24 h-24 rounded-full object-cover border-4 border-surface-container-high shadow-md shrink-0"
-        />
+        <div className="w-24 h-24 rounded-full bg-secondary/10 text-secondary flex items-center justify-center border-4 border-surface-container-high shadow-md shrink-0 font-bold text-[32px]">
+          {name.charAt(0).toUpperCase()}
+        </div>
 
         <div className="flex-1 space-y-xs text-center md:text-left">
           <span className="px-3 py-1 bg-secondary/10 text-secondary font-label text-[11px] font-bold rounded-full uppercase">
             Super Administrator
           </span>
           <h3 className="font-headline text-[24px] font-bold text-on-surface mt-1">{name}</h3>
-          <p className="font-body text-[14px] text-on-surface-variant">{currentUserAdmin.title}</p>
-          <p className="font-label text-[12px] text-outline font-medium">Department: {currentUserAdmin.department}</p>
+          <p className="font-body text-[14px] text-on-surface-variant">{email}</p>
+          <p className="font-label text-[12px] text-outline font-medium">Department: IT & Institutional Administration</p>
         </div>
       </div>
 

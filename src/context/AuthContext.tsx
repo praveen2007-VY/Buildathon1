@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  const login = async (email: string, password = 'password123', role: UserRole = 'student'): Promise<User> => {
+  const login = async (email: string, password?: string, role: UserRole = 'student'): Promise<User> => {
     setIsLoading(true);
     try {
       const res = await api.login({ email, password, role });
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password = 'password123', role: UserRole = 'student'): Promise<User> => {
+  const register = async (name: string, email: string, password?: string, role: UserRole = 'student'): Promise<User> => {
     setIsLoading(true);
     try {
       const res = await api.register({ name, email, password, role });

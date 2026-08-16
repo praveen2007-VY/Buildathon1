@@ -1,25 +1,9 @@
 import React, { useState } from 'react';
-import { BarChart2, TrendingUp, Download, Filter, FileText, CheckCircle2 } from 'lucide-react';
-import { 
-  adminAcademicPerformanceData, 
-  adminDepartmentPerformanceData, 
-  studentAttendanceChartData 
-} from '../../data/mockData';
-import { 
-  ResponsiveContainer, 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip 
-} from 'recharts';
+import { Download, Filter, FileText, CheckCircle2 } from 'lucide-react';
 
 export const ReportsAnalytics: React.FC = () => {
   const [selectedDept, setSelectedDept] = useState('All');
-  const [selectedReportType, setSelectedReportType] = useState('Academic Performance');
+  const [selectedReportType, setSelectedReportType] = useState('Attendance Compliance');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const handleGenerateReport = (title: string) => {
@@ -36,7 +20,7 @@ export const ReportsAnalytics: React.FC = () => {
             Reports & Institutional Analytics
           </h2>
           <p className="font-body text-[14px] text-on-surface-variant mt-1">
-            Generate cross-departmental reports on student achievement, attendance compliance, and risk metrics.
+            Generate cross-departmental reports on attendance compliance, examinations, and risk metrics.
           </p>
         </div>
 
@@ -79,55 +63,17 @@ export const ReportsAnalytics: React.FC = () => {
           onChange={(e) => setSelectedReportType(e.target.value)}
           className="bg-surface-container-low border border-outline-variant/50 rounded-lg px-3 py-2 text-[14px] outline-none cursor-pointer text-on-surface"
         >
-          <option value="Academic Performance">Report: Academic Performance</option>
           <option value="Attendance Compliance">Report: Attendance Compliance</option>
           <option value="Examination Analytics">Report: Examination Analytics</option>
           <option value="Risk Analysis">Report: Risk Analysis</option>
         </select>
       </div>
 
-      {/* Main Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
-        {/* Overall GPA & Performance Trend */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card space-y-md">
-          <h3 className="font-title text-[18px] font-bold text-on-surface">Institutional GPA Performance Trend</h3>
-          <div className="w-full h-64 bg-surface-container-low/50 rounded-lg p-sm border border-dashed border-outline-variant">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={adminAcademicPerformanceData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#c2c6d6" opacity={0.3} />
-                <XAxis dataKey="month" stroke="#727785" fontSize={12} tickLine={false} />
-                <YAxis domain={[2.5, 4.0]} stroke="#727785" fontSize={12} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #c2c6d6', fontSize: '12px' }} />
-                <Line type="monotone" dataKey="gpa" name="GPA (4.0 scale)" stroke="#0058be" strokeWidth={3} dot={{ fill: '#0058be', r: 5 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Department Comparison Chart */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card space-y-md">
-          <h3 className="font-title text-[18px] font-bold text-on-surface">Department Performance Comparison</h3>
-          <div className="w-full h-64 bg-surface-container-low/50 rounded-lg p-sm border border-dashed border-outline-variant">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={adminDepartmentPerformanceData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#c2c6d6" opacity={0.3} />
-                <XAxis dataKey="department" stroke="#727785" fontSize={12} tickLine={false} />
-                <YAxis domain={[50, 100]} stroke="#727785" fontSize={12} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #c2c6d6', fontSize: '12px' }} />
-                <Bar dataKey="currentTerm" name="Current Term Score (%)" fill="#0058be" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="previousTerm" name="Previous Term Score (%)" fill="#4648d4" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
       {/* Exportable Report Cards Grid */}
       <div className="space-y-md">
         <h3 className="font-title text-[20px] font-bold text-on-surface">Exportable Institutional Reports</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
           {[
-            { title: 'Academic Performance Report', desc: 'Semester GPA averages, grade distribution curves, and department performance rankings.' },
             { title: 'Attendance Compliance Report', desc: 'Cross-faculty presence tracking, absenteeism alerts, and lecture attendance logs.' },
             { title: 'Examination Analytics Report', desc: 'Midterm and final exam outcome metrics, score variance, and pass/fail distributions.' },
             { title: 'Institutional Risk Analysis Report', desc: 'Comprehensive identification of at-risk student cohorts and recommended interventions.' }

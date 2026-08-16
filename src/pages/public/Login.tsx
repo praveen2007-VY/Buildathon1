@@ -22,20 +22,19 @@ export const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
+    if (!email.trim() || !password) {
+      setError('Please enter both your email address and password.');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const emailToUse = email.trim() || (
-        selectedRole === 'student' ? 'alex.rivera@eduai.edu' :
-        selectedRole === 'teacher' ? 'henderson@eduai.edu' :
-        's.jenkins@eduai.edu'
-      );
-      const user = await login(emailToUse, password || 'password123', selectedRole);
+      const user = await login(email.trim(), password, selectedRole);
 
       // If there was a redirect URL and user role matches requested portal
       if (redirectUrl && (
-        (redirectUrl.startsWith('/student') && (user.role === 'student' || user.role === 'admin')) ||
-        (redirectUrl.startsWith('/teacher') && (user.role === 'teacher' || user.role === 'admin')) ||
+        (redirectUrl.startsWith('/student') && user.role === 'student') ||
+        (redirectUrl.startsWith('/teacher') && user.role === 'teacher') ||
         (redirectUrl.startsWith('/admin') && user.role === 'admin')
       )) {
         navigate(redirectUrl);
@@ -50,7 +49,7 @@ export const Login: React.FC = () => {
         navigate('/admin');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check credentials.');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsSubmitting(false);
     }
@@ -152,13 +151,7 @@ export const Login: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={
-                    selectedRole === 'student'
-                      ? 'alex.rivera@eduai.edu'
-                      : selectedRole === 'teacher'
-                      ? 'henderson@eduai.edu'
-                      : 's.jenkins@eduai.edu'
-                  }
+                  placeholder="user@example.com"
                   className="w-full pl-10 pr-sm py-[10px] border border-outline-variant/60 rounded-lg font-body text-[14px] leading-[20px] bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-outline-variant text-on-surface"
                 />
               </div>

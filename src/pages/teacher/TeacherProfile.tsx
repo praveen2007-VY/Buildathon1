@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { User as UserIcon, Mail, Phone, MapPin, Edit3, Save, X, CheckCircle2 } from 'lucide-react';
-import { currentUserTeacher } from '../../data/mockData';
+import { Edit3, Save, X, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const TeacherProfile: React.FC = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUserTeacher.name);
-  const [email, setEmail] = useState(currentUserTeacher.email);
-  const [phone, setPhone] = useState(currentUserTeacher.phone || '+1 (555) 876-5432');
-  const [officeRoom, setOfficeRoom] = useState(currentUserTeacher.officeRoom || 'Science Building - Room 402B');
+  const [name, setName] = useState(user?.name || 'Faculty Professor');
+  const [email, setEmail] = useState(user?.email || 'teacher@eduai.edu');
+  const [phone, setPhone] = useState('+1 (555) 876-5432');
+  const [officeRoom, setOfficeRoom] = useState('Science Building - Room 402B');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    updateUser({ name, email });
     setIsEditing(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -67,19 +69,17 @@ export const TeacherProfile: React.FC = () => {
 
       {/* Main Avatar & Faculty Card */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card flex flex-col md:flex-row items-center md:items-start gap-lg">
-        <img 
-          src={currentUserTeacher.avatar} 
-          alt={currentUserTeacher.name} 
-          className="w-24 h-24 rounded-full object-cover border-4 border-surface-container-high shadow-md shrink-0"
-        />
+        <div className="w-24 h-24 rounded-full bg-secondary/10 text-secondary flex items-center justify-center border-4 border-surface-container-high shadow-md shrink-0 font-bold text-[32px]">
+          {name.charAt(0).toUpperCase()}
+        </div>
 
         <div className="flex-1 space-y-xs text-center md:text-left">
           <span className="px-3 py-1 bg-primary/10 text-primary font-label text-[11px] font-bold rounded-full uppercase">
-            Senior Faculty
+            Faculty Professor
           </span>
           <h3 className="font-headline text-[24px] font-bold text-on-surface mt-1">{name}</h3>
-          <p className="font-body text-[14px] text-on-surface-variant">{currentUserTeacher.title}</p>
-          <p className="font-label text-[12px] text-outline font-medium">Employee ID: {currentUserTeacher.employeeId}</p>
+          <p className="font-body text-[14px] text-on-surface-variant">{email}</p>
+          <p className="font-label text-[12px] text-outline font-medium">Employee ID: {user?.id || 'tch_active'}</p>
         </div>
       </div>
 
@@ -142,12 +142,12 @@ export const TeacherProfile: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-md text-[14px]">
           <div className="p-md rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-1">
             <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Department</p>
-            <p className="font-body font-bold text-on-surface">{currentUserTeacher.department}</p>
+            <p className="font-body font-bold text-on-surface">{user?.department || 'Academic Faculty'}</p>
           </div>
 
           <div className="p-md rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-1">
             <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Academic Rank</p>
-            <p className="font-body font-bold text-on-surface">Senior Faculty Professor</p>
+            <p className="font-body font-bold text-on-surface">Faculty Professor</p>
           </div>
         </div>
       </form>
