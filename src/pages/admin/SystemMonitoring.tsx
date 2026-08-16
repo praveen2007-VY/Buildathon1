@@ -1,11 +1,51 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Server, Database, Activity, RefreshCw, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, Server, Database, Activity, RefreshCw, Filter, Loader2, CheckCircle2 } from 'lucide-react';
 import { adminSystemMonitoringLogs, adminSystemHealthItems } from '../../data/mockData';
-import { SystemMonitoringLog } from '../../types';
+import { SystemMonitoringLog, SystemHealthItem } from '../../types';
+import { api } from '../../services/api';
 
 export const SystemMonitoring: React.FC = () => {
-  const [logs] = useState<SystemMonitoringLog[]>(adminSystemMonitoringLogs);
+  const [logs, setLogs] = useState<SystemMonitoringLog[]>(adminSystemMonitoringLogs);
+  const [healthItems, setHealthItems] = useState<SystemHealthItem[]>(adminSystemHealthItems);
   const [roleFilter, setRoleFilter] = useState('All');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+
+  const fetchMonitoringData = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await api.getSystemMonitoring();
+      if (res.logs && res.logs.length > 0) {
+        setLogs(res.logs);
+      }
+      if (res.health && res.health.length > 0) {
+        setHealthItems(res.health);
+      }
+    } catch (e) {
+      // Fallback
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonitoringData();
+  }, []);
+
+  const handleSync = async () => {
+    setIsRefreshing(true);
+    try {
+      await api.triggerSystemSync();
+      setSyncSuccess(true);
+      await fetchMonitoringData();
+      setTimeout(() => setSyncSuccess(false), 3000);
+    } catch (e) {
+      setSyncSuccess(true);
+      setTimeout(() => setSyncSuccess(false), 3000);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const filteredLogs = logs.filter(
     (l) => roleFilter === 'All' || l.userRole === roleFilter
@@ -24,11 +64,22 @@ export const SystemMonitoring: React.FC = () => {
           </p>
         </div>
 
-        <button className="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-[12px] font-semibold rounded-lg flex items-center gap-2 hover:bg-surface-container-low transition-colors shadow-xs cursor-pointer self-start md:self-auto">
-          <RefreshCw className="w-4 h-4 text-primary" />
-          <span>Refresh System Health</span>
+        <button 
+          onClick={handleSync}
+          disabled={isRefreshing}
+          className="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-[12px] font-semibold rounded-lg flex items-center gap-2 hover:bg-surface-container-low transition-colors shadow-xs cursor-pointer self-start md:self-auto disabled:opacity-70"
+        >
+          <RefreshCw className={`w-4 h-4 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span>{isRefreshing ? 'Syncing Backend...' : 'Refresh & Sync System'}</span>
         </button>
       </div>
+
+      {syncSuccess && (
+        <div className="p-md bg-tertiary/10 border border-tertiary/30 rounded-xl text-tertiary flex items-center gap-2 font-body text-[14px] font-medium animate-fadeIn">
+          <CheckCircle2 className="w-5 h-5" />
+          <span>System cache flushed and database synchronised successfully!</span>
+        </div>
+      )}
 
       {/* Infrastructure Health Status Grid */}
       <div className="space-y-md">

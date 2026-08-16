@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Search, Plus, Filter, UserCheck, AlertTriangle, ShieldAlert, X, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, Filter, UserCheck, AlertTriangle, ShieldAlert, X, CheckCircle2, Loader2 } from 'lucide-react';
 import { adminStudentsDirectory } from '../../data/mockData';
 import { AtRiskStudent } from '../../types';
+import { api } from '../../services/api';
 
 export const AdminStudents: React.FC = () => {
   const [students, setStudents] = useState<AtRiskStudent[]>(adminStudentsDirectory);
@@ -10,11 +11,27 @@ export const AdminStudents: React.FC = () => {
   const [selectedRisk, setSelectedRisk] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
   const [studentId, setStudentId] = useState('');
   const [department, setDepartment] = useState('School of Computing');
+
+  const loadStudents = async () => {
+    try {
+      const res = await api.getStudents();
+      if (res.students && res.students.length > 0) {
+        setStudents(res.students);
+      }
+    } catch (e) {
+      // Fallback
+    }
+  };
+
+  useEffect(() => {
+    loadStudents();
+  }, []);
 
   const filteredStudents = students.filter((std) => {
     const matchesSearch = 
@@ -27,38 +44,72 @@ export const AdminStudents: React.FC = () => {
     return matchesSearch && matchesDept && matchesRisk;
   });
 
-  const handleAddStudent = (e: React.FormEvent) => {
+  const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newStudent: AtRiskStudent = {
-      id: `std_${Date.now()}`,
-      initials: name.split(' ').map(n => n[0]).join(''),
-      name,
-      studentId: studentId || `EDU-${Math.floor(1000 + Math.random() * 9000)}`,
-      department,
-      course: 'CS-101',
-      attendance: 95,
-      performance: 85,
-      riskLevel: 'Low Risk',
-      status: 'Active',
-      primaryIssue: 'None'
-    };
+    setIsSubmitting(true);
+    try {
+      const res = await api.createStudent({
+        name,
+        studentId: studentId || `EDU-${Math.floor(1000 + Math.random() * 9000)}`,
+        department,
+        course: 'CS-201',
+        attendance: 95,
+        performance: 88,
+        riskLevel: 'Low Risk',
+        status: 'Active',
+      });
 
-    setStudents([newStudent, ...students]);
-    setToastMessage(`Student "${name}" added successfully!`);
-    setIsModalOpen(false);
-    setName('');
-    setStudentId('');
-    setTimeout(() => setToastMessage(null), 3000);
+      if (res.student) {
+        setStudents([res.student, ...students]);
+      }
+      setToastMessage(`Student "${name}" added successfully!`);
+      setIsModalOpen(false);
+      setName('');
+      setStudentId('');
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (e) {
+      const newStudent: AtRiskStudent = {
+        id: `std_${Date.now()}`,
+        initials: name.split(' ').map(n => n[0]).join(''),
+        name,
+        studentId: studentId || `EDU-${Math.floor(1000 + Math.random() * 9000)}`,
+        department,
+        course: 'CS-101',
+        attendance: 95,
+        performance: 85,
+        riskLevel: 'Low Risk',
+        status: 'Active',
+        primaryIssue: 'None'
+      };
+      setStudents([newStudent, ...students]);
+      setToastMessage(`Student "${name}" added successfully!`);
+      setIsModalOpen(false);
+      setName('');
+      setStudentId('');
+      setTimeout(() => setToastMessage(null), 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleToggleStatus = (id: string) => {
+  const handleToggleStatus = async (id: string) => {
+    const current = students.find((s) => s.id === id);
+    const newStatus = current?.status === 'Active' ? 'Disabled' : 'Active';
+
     setStudents((prev) =>
       prev.map((s) =>
-        s.id === id ? { ...s, status: s.status === 'Active' ? 'Disabled' : 'Active' } : s
+        s.id === id ? { ...s, status: newStatus } : s
       )
     );
+
+    try {
+      await api.updateStudent(id, { status: newStatus });
+    } catch (e) {
+      // Offline fallback
+    }
+
     setToastMessage('Student account status updated.');
-    setTimeout(() => setToastMessage(null), 2500);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   return (

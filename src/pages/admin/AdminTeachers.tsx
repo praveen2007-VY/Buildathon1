@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { Search, Plus, Filter, UserCheck, X, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, Filter, UserCheck, X, CheckCircle2, Loader2 } from 'lucide-react';
 import { adminTeachersDirectory } from '../../data/mockData';
 import { AdminTeacher } from '../../types';
+import { api } from '../../services/api';
 
 export const AdminTeachers: React.FC = () => {
   const [teachers, setTeachers] = useState<AdminTeacher[]>(adminTeachersDirectory);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
@@ -15,31 +17,73 @@ export const AdminTeachers: React.FC = () => {
   const [email, setEmail] = useState('');
   const [department, setDepartment] = useState('School of Computing');
 
+  const loadTeachers = async () => {
+    try {
+      const res = await api.getTeachers();
+      if (res.teachers && res.teachers.length > 0) {
+        setTeachers(res.teachers);
+      }
+    } catch (e) {
+      // Fallback
+    }
+  };
+
+  useEffect(() => {
+    loadTeachers();
+  }, []);
+
   const filteredTeachers = teachers.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.employeeId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddTeacher = (e: React.FormEvent) => {
+  const handleAddTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTeacher: AdminTeacher = {
-      id: `t_${Date.now()}`,
-      name,
-      employeeId: employeeId || `TCH-${Math.floor(100 + Math.random() * 900)}`,
-      email: email || `${name.toLowerCase().replace(' ', '.')}@eduai.edu`,
-      department,
-      coursesCount: 2,
-      studentsCount: 60,
-      designation: 'Assistant Professor',
-      status: 'Active'
-    };
+    setIsSubmitting(true);
+    try {
+      const res = await api.createTeacher({
+        name,
+        employeeId: employeeId || `TCH-${Math.floor(100 + Math.random() * 900)}`,
+        email: email || `${name.toLowerCase().replace(/\s+/g, '.')}@eduai.edu`,
+        department,
+        coursesCount: 2,
+        studentsCount: 65,
+        designation: 'Assistant Professor',
+        status: 'Active',
+      });
 
-    setTeachers([newTeacher, ...teachers]);
-    setToastMessage(`Faculty member "${name}" added!`);
-    setIsModalOpen(false);
-    setName('');
-    setEmployeeId('');
-    setTimeout(() => setToastMessage(null), 3000);
+      if (res.teacher) {
+        setTeachers([res.teacher, ...teachers]);
+      }
+      setToastMessage(`Faculty member "${name}" added!`);
+      setIsModalOpen(false);
+      setName('');
+      setEmployeeId('');
+      setEmail('');
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (e) {
+      const newTeacher: AdminTeacher = {
+        id: `t_${Date.now()}`,
+        name,
+        employeeId: employeeId || `TCH-${Math.floor(100 + Math.random() * 900)}`,
+        email: email || `${name.toLowerCase().replace(' ', '.')}@eduai.edu`,
+        department,
+        coursesCount: 2,
+        studentsCount: 60,
+        designation: 'Assistant Professor',
+        status: 'Active'
+      };
+
+      setTeachers([newTeacher, ...teachers]);
+      setToastMessage(`Faculty member "${name}" added!`);
+      setIsModalOpen(false);
+      setName('');
+      setEmployeeId('');
+      setEmail('');
+      setTimeout(() => setToastMessage(null), 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleToggleStatus = (id: string) => {

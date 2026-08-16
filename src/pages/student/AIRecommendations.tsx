@@ -1,8 +1,27 @@
-import React from 'react';
-import { Sparkles, AlertCircle, CheckCircle, ArrowRight, BookOpen, Target } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, AlertCircle, CheckCircle, ArrowRight, BookOpen, Target, Loader2 } from 'lucide-react';
 import { studentAIInsightsDetailed } from '../../data/mockData';
+import { AIRecommendation } from '../../types';
+import { api } from '../../services/api';
 
 export const AIRecommendations: React.FC = () => {
+  const [insights, setInsights] = useState<AIRecommendation[]>(studentAIInsightsDetailed);
+  const [summary, setSummary] = useState<string>('Your recent assignment scores have declined by 12% in Database Systems while attendance remains stable at 81%. Early intervention can prevent grade loss prior to final examinations.');
+  const [overallRisk, setOverallRisk] = useState<string>('Medium');
+
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      try {
+        const res = await api.getStudentAIRecommendations();
+        if (res.recommendations && res.recommendations.length > 0) {
+          setInsights(res.recommendations);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadRecommendations();
+  }, []);
   return (
     <div className="space-y-lg max-w-7xl mx-auto pb-8">
       {/* Page Header */}

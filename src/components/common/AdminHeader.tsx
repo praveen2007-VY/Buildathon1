@@ -1,13 +1,21 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Search, Bell, Menu } from 'lucide-react';
-import { currentUserAdmin } from '../../data/mockData';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Search, Bell, Menu, LogOut, ShieldAlert } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface AdminHeaderProps {
   onToggleMobileMenu?: () => void;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleMobileMenu }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <header className="bg-surface/80 backdrop-blur-md top-0 sticky z-30 border-b border-outline-variant shadow-sm flex justify-between items-center w-full h-16 px-lg transition-colors">
       {/* Mobile Menu Button & Brand */}
@@ -34,7 +42,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleMobileMenu }) 
         </div>
       </div>
 
-      {/* Role Switcher Pill */}
+      {/* Role Switcher Pill for Admin */}
       <div className="hidden lg:flex items-center bg-surface-container p-1 rounded-full gap-1 border border-outline-variant/30 ml-md">
         <NavLink 
           to="/student"
@@ -68,11 +76,19 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleMobileMenu }) 
 
         <NavLink to="/admin/profile" className="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden shrink-0 ml-2 cursor-pointer">
           <img 
-            src={currentUserAdmin.avatar} 
-            alt={currentUserAdmin.name}
+            src={user?.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'} 
+            alt={user?.name || 'Admin'}
             className="w-full h-full object-cover" 
           />
         </NavLink>
+
+        <button 
+          onClick={handleLogout}
+          title="Sign Out"
+          className="p-1.5 text-on-surface-variant hover:text-error hover:bg-surface-container-low rounded-full transition-colors cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </header>
   );

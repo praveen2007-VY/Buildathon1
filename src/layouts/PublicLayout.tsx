@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const PublicLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const navLinks = [
@@ -11,6 +13,13 @@ export const PublicLayout: React.FC = () => {
     { label: 'Courses', path: '/courses' },
     { label: 'Contact', path: '/contact' },
   ];
+
+  const getDashboardPath = () => {
+    if (!user) return '/login';
+    if (user.role === 'teacher') return '/teacher';
+    if (user.role === 'admin') return '/admin';
+    return '/student';
+  };
 
   return (
     <div className="bg-background text-on-background font-sans min-h-screen flex flex-col antialiased overflow-x-hidden">
@@ -44,18 +53,39 @@ export const PublicLayout: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-sm">
-          <button 
-            onClick={() => navigate('/login')}
-            className="px-md py-sm text-on-surface-variant font-label text-[12px] leading-[16px] font-medium hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer"
-          >
-            Login
-          </button>
-          <button 
-            onClick={() => navigate('/register')}
-            className="px-md py-sm bg-primary text-on-primary font-label text-[12px] leading-[16px] font-semibold rounded-lg hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
-          >
-            Register
-          </button>
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-sm">
+              <button 
+                onClick={() => navigate(getDashboardPath())}
+                className="px-md py-sm bg-primary text-on-primary font-label text-[12px] leading-[16px] font-semibold rounded-lg hover:opacity-90 transition-opacity cursor-pointer shadow-xs flex items-center gap-1.5"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>{user.role.charAt(0).toUpperCase() + user.role.slice(1)} Portal</span>
+              </button>
+              <button 
+                onClick={logout}
+                title="Sign Out"
+                className="p-2 text-on-surface-variant hover:text-error hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <button 
+                onClick={() => navigate('/login')}
+                className="px-md py-sm text-on-surface-variant font-label text-[12px] leading-[16px] font-medium hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer"
+              >
+                Login
+              </button>
+              <button 
+                onClick={() => navigate('/register')}
+                className="px-md py-sm bg-primary text-on-primary font-label text-[12px] leading-[16px] font-semibold rounded-lg hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+              >
+                Register
+              </button>
+            </>
+          )}
           
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -88,18 +118,37 @@ export const PublicLayout: React.FC = () => {
             </NavLink>
           ))}
           <div className="pt-sm border-t border-outline-variant/30 flex gap-sm mt-xs">
-            <button 
-              onClick={() => { setMobileMenuOpen(false); navigate('/login'); }}
-              className="flex-1 py-sm bg-surface-container-low text-on-surface font-label text-[12px] font-semibold rounded-lg"
-            >
-              Login
-            </button>
-            <button 
-              onClick={() => { setMobileMenuOpen(false); navigate('/register'); }}
-              className="flex-1 py-sm bg-primary text-on-primary font-label text-[12px] font-semibold rounded-lg"
-            >
-              Register
-            </button>
+            {isAuthenticated && user ? (
+              <>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); navigate(getDashboardPath()); }}
+                  className="flex-1 py-sm bg-primary text-on-primary font-label text-[12px] font-semibold rounded-lg"
+                >
+                  Go to {user.role} Dashboard
+                </button>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); logout(); }}
+                  className="px-4 py-sm bg-surface-container-low text-error font-label text-[12px] font-semibold rounded-lg"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); navigate('/login'); }}
+                  className="flex-1 py-sm bg-surface-container-low text-on-surface font-label text-[12px] font-semibold rounded-lg"
+                >
+                  Login
+                </button>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); navigate('/register'); }}
+                  className="flex-1 py-sm bg-primary text-on-primary font-label text-[12px] font-semibold rounded-lg"
+                >
+                  Register
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

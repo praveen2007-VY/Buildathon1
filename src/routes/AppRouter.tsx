@@ -53,6 +53,8 @@ import { AIInsights } from '../pages/admin/AIInsights';
 import { SystemMonitoring } from '../pages/admin/SystemMonitoring';
 import { AdminProfile } from '../pages/admin/AdminProfile';
 
+import { ProtectedRoute } from '../components/common/ProtectedRoute';
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -68,7 +70,14 @@ export const AppRouter: React.FC = () => {
         </Route>
 
         {/* Student Portal Routes */}
-        <Route path="/student" element={<StudentLayout />}>
+        <Route 
+          path="/student" 
+          element={
+            <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<StudentDashboard />} />
           <Route path="courses" element={<MyCourses />} />
           <Route path="assignments" element={<Assignments />} />
@@ -82,7 +91,14 @@ export const AppRouter: React.FC = () => {
         </Route>
 
         {/* Teacher Portal Routes */}
-        <Route path="/teacher" element={<TeacherLayout />}>
+        <Route 
+          path="/teacher" 
+          element={
+            <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+              <TeacherLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<TeacherDashboard />} />
           <Route path="courses" element={<TeacherCourses />} />
           <Route path="classes" element={<Classes />} />
@@ -96,7 +112,14 @@ export const AppRouter: React.FC = () => {
         </Route>
 
         {/* Admin Portal Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<AdminDashboard />} />
           <Route path="students" element={<AdminStudents />} />
           <Route path="teachers" element={<AdminTeachers />} />

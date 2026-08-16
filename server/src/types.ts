@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string;
   role: UserRole;
   avatar: string;
   title?: string;
@@ -14,77 +15,33 @@ export interface User {
   officeRoom?: string;
   semester?: string;
   phone?: string;
+  createdAt?: string;
 }
 
-export interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: string;
-  iconBgColor?: string;
-  iconTextColor?: string;
-  trend?: {
-    value: string;
-    isPositive?: boolean;
-    isWarning?: boolean;
-    label?: string;
-  };
-  subtitle?: string;
-}
-
-export interface CourseProgressItem {
+export interface Course {
   id: string;
   name: string;
+  title?: string;
   code: string;
-  progress: number;
-  grade?: string;
-  color?: string;
-  isRisk?: boolean;
-  instructor?: string;
-  lastAccessed?: string;
-  category?: string;
-  status?: 'Active' | 'Completed' | 'Upcoming';
-}
-
-export interface UpcomingActivity {
-  id: string;
-  title: string;
-  type: 'lecture' | 'assignment' | 'exam' | 'quiz';
-  date: string;
-  time: string;
-  course: string;
-  color: string;
-}
-
-export interface AIRecommendation {
-  id: string;
-  targetSubject: string;
-  scoreChange: string;
-  insightText: string;
-  recommendations: string[];
-  riskLevel: 'Low' | 'Medium' | 'High';
-  actionText: string;
-  priority?: 'High' | 'Medium' | 'Low';
-  reason?: string;
-  suggestedAction?: string;
-}
-
-export interface SemesterPerformancePoint {
-  month: string;
-  score: number;
-  target: number;
-}
-
-export interface TeacherCourse {
-  id: string;
-  name: string;
-  code: string;
-  schedule: string;
-  studentCount: number;
-  avgGrade: string;
+  category?: 'Computer Science' | 'Data Science' | 'Engineering' | 'Humanities' | 'Sciences' | string;
   department?: string;
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  instructor: string;
+  instructorId?: string;
+  rating?: number;
+  reviewsCount?: number;
+  enrolledCount?: number;
+  duration?: string;
+  image?: string;
+  isAiRecommended?: boolean;
+  description?: string;
+  outcomes?: string[];
+  syllabus?: { week: string; topic: string }[];
+  schedule?: string;
+  studentCount?: number;
+  avgGrade?: string;
   credits?: number;
   status?: 'Active' | 'Draft' | 'Archived';
-  instructor?: string;
 }
 
 export interface TeacherClass {
@@ -100,73 +57,6 @@ export interface TeacherClass {
   attendanceRate: number;
   instructor?: string;
   capacity?: number;
-}
-
-export interface AtRiskStudent {
-  id: string;
-  initials: string;
-  name: string;
-  riskLevel: 'High Risk' | 'Medium Risk' | 'Low Risk';
-  primaryIssue?: string;
-  avatarBgColor?: string;
-  avatarTextColor?: string;
-  studentId?: string;
-  department?: string;
-  course?: string;
-  attendance?: number;
-  performance?: number;
-  status?: 'Active' | 'Disabled';
-}
-
-export interface AdminTeacher {
-  id: string;
-  name: string;
-  employeeId: string;
-  email: string;
-  department: string;
-  coursesCount: number;
-  studentsCount: number;
-  designation: string;
-  status: 'Active' | 'Disabled';
-  phone?: string;
-}
-
-export interface ClassPerformanceTrendPoint {
-  week: string;
-  avgScore: number;
-  attendance: number;
-}
-
-export interface DepartmentPerformancePoint {
-  department: string;
-  currentTerm: number;
-  previousTerm: number;
-}
-
-export interface SystemMonitoringLog {
-  id: string;
-  title: string;
-  time: string;
-  source: string;
-  type: 'sync' | 'security' | 'user' | 'warning';
-  userRole?: string;
-  action?: string;
-  module?: string;
-  status?: 'Success' | 'Warning' | 'Error';
-}
-
-export interface SystemHealthItem {
-  name: string;
-  status: 'Operational' | 'Warning' | 'Critical';
-  uptime: string;
-  latency: string;
-}
-
-export interface RiskDistribution {
-  name: string;
-  value: number;
-  percentage: number;
-  color: string;
 }
 
 export interface StudentAssignment {
@@ -211,6 +101,7 @@ export interface TeacherSubmission {
 
 export interface SubjectAttendance {
   id: string;
+  studentId: string;
   subject: string;
   code: string;
   classesHeld: number;
@@ -222,10 +113,14 @@ export interface SubjectAttendance {
 }
 
 export interface TeacherAttendanceRecord {
+  id?: string;
   studentId: string;
   studentName: string;
+  courseCode?: string;
+  section?: string;
   status: 'Present' | 'Absent' | 'Late';
   attendancePercentage: number;
+  date?: string;
 }
 
 export interface StudentExam {
@@ -248,6 +143,8 @@ export interface StudentExam {
 
 export interface StudentGradeRecord {
   id: string;
+  studentId: string;
+  studentName: string;
   subject: string;
   code: string;
   assessment: string;
@@ -257,14 +154,13 @@ export interface StudentGradeRecord {
   status: 'Pass' | 'Fail' | 'Pending';
   semester: string;
   department?: string;
-  studentName?: string;
-  studentId?: string;
 }
 
 export interface TeacherGradeEntry {
   id: string;
   studentName: string;
   studentId: string;
+  courseCode?: string;
   assignmentScore: number;
   examScore: number;
   totalScore: number;
@@ -274,6 +170,7 @@ export interface TeacherGradeEntry {
 
 export interface ScheduleItem {
   id: string;
+  studentId?: string;
   day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
   time: string;
   subject: string;
@@ -283,6 +180,20 @@ export interface ScheduleItem {
   isUpcoming?: boolean;
 }
 
+export interface AIRecommendation {
+  id: string;
+  studentId?: string;
+  targetSubject: string;
+  scoreChange: string;
+  insightText: string;
+  recommendations: string[];
+  riskLevel: 'Low' | 'Medium' | 'High';
+  actionText: string;
+  priority?: 'High' | 'Medium' | 'Low';
+  reason?: string;
+  suggestedAction?: string;
+}
+
 export interface WeakTopic {
   id: string;
   topic: string;
@@ -290,4 +201,52 @@ export interface WeakTopic {
   studentsAffectedPercentage: number;
   severity: 'High' | 'Medium' | 'Low';
   recommendedAction: string;
+}
+
+export interface SystemMonitoringLog {
+  id: string;
+  title: string;
+  time: string;
+  source: string;
+  type: 'sync' | 'security' | 'user' | 'warning';
+  userRole?: string;
+  action?: string;
+  module?: string;
+  status?: 'Success' | 'Warning' | 'Error';
+}
+
+export interface SystemHealthItem {
+  name: string;
+  status: 'Operational' | 'Warning' | 'Critical';
+  uptime: string;
+  latency: string;
+}
+
+export interface AtRiskStudent {
+  id: string;
+  initials: string;
+  name: string;
+  riskLevel: 'High Risk' | 'Medium Risk' | 'Low Risk';
+  primaryIssue?: string;
+  avatarBgColor?: string;
+  avatarTextColor?: string;
+  studentId?: string;
+  department?: string;
+  course?: string;
+  attendance?: number;
+  performance?: number;
+  status?: 'Active' | 'Disabled';
+}
+
+export interface AdminTeacher {
+  id: string;
+  name: string;
+  employeeId: string;
+  email: string;
+  department: string;
+  coursesCount: number;
+  studentsCount: number;
+  designation: string;
+  status: 'Active' | 'Disabled';
+  phone?: string;
 }

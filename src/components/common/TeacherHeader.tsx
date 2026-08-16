@@ -1,13 +1,21 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Search, Bell, BookOpenCheck, HelpCircle, Menu } from 'lucide-react';
-import { currentUserTeacher } from '../../data/mockData';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Search, Bell, BookOpenCheck, HelpCircle, Menu, LogOut, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface TeacherHeaderProps {
   onToggleMobileMenu?: () => void;
 }
 
 export const TeacherHeader: React.FC<TeacherHeaderProps> = ({ onToggleMobileMenu }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <header className="flex justify-between items-center h-16 px-lg bg-surface/80 backdrop-blur-md sticky top-0 z-30 w-full shadow-sm border-b border-outline-variant/50">
       {/* Mobile Menu & Search */}
@@ -30,27 +38,34 @@ export const TeacherHeader: React.FC<TeacherHeaderProps> = ({ onToggleMobileMenu
         </div>
       </div>
 
-      {/* Role Switcher Pill */}
-      <div className="hidden lg:flex items-center bg-surface-container p-1 rounded-full gap-1 border border-outline-variant/30 ml-md">
-        <NavLink 
-          to="/student"
-          className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
-        >
-          Student
-        </NavLink>
-        <NavLink 
-          to="/teacher"
-          className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
-        >
-          Teacher
-        </NavLink>
-        <NavLink 
-          to="/admin"
-          className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
-        >
-          Admin
-        </NavLink>
-      </div>
+      {/* Role Pill */}
+      {user?.role === 'admin' ? (
+        <div className="hidden lg:flex items-center bg-surface-container p-1 rounded-full gap-1 border border-outline-variant/30 ml-md">
+          <NavLink 
+            to="/student"
+            className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Student
+          </NavLink>
+          <NavLink 
+            to="/teacher"
+            className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Teacher
+          </NavLink>
+          <NavLink 
+            to="/admin"
+            className={({ isActive }) => `px-3 py-1 rounded-full font-label text-[11px] font-bold transition-all ${isActive ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Admin
+          </NavLink>
+        </div>
+      ) : (
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-full font-label text-[12px] font-bold ml-md">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Faculty Member</span>
+        </div>
+      )}
 
       {/* Actions & Avatar */}
       <div className="flex items-center gap-md ml-auto">
@@ -64,11 +79,19 @@ export const TeacherHeader: React.FC<TeacherHeaderProps> = ({ onToggleMobileMenu
 
         <NavLink to="/teacher/profile" className="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-sm cursor-pointer shrink-0">
           <img 
-            src={currentUserTeacher.avatar} 
-            alt={currentUserTeacher.name}
+            src={user?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'} 
+            alt={user?.name || 'Teacher'}
             className="w-full h-full object-cover" 
           />
         </NavLink>
+
+        <button 
+          onClick={handleLogout}
+          title="Sign Out"
+          className="p-1.5 text-on-surface-variant hover:text-error hover:bg-surface-container-low rounded-full transition-colors cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </header>
   );

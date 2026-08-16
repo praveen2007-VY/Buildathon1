@@ -1,23 +1,58 @@
 import React, { useState } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { useNavigate, useLocation, useSearchParams, NavLink } from 'react-router-dom';
+import { Mail, Lock, ArrowRight, AlertCircle, Loader2, Info } from 'lucide-react';
 import { UserRole } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 export const Login: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const redirectUrl = searchParams.get('redirect');
+  const sessionNotice = (location.state as any)?.message;
+  const accessError = (location.state as any)?.accessError;
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Frontend mock redirect based on role
-    if (selectedRole === 'student') {
-      navigate('/student');
-    } else if (selectedRole === 'teacher') {
-      navigate('/teacher');
-    } else if (selectedRole === 'admin') {
-      navigate('/admin');
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const emailToUse = email.trim() || (
+        selectedRole === 'student' ? 'alex.rivera@eduai.edu' :
+        selectedRole === 'teacher' ? 'henderson@eduai.edu' :
+        's.jenkins@eduai.edu'
+      );
+      const user = await login(emailToUse, password || 'password123', selectedRole);
+
+      // If there was a redirect URL and user role matches requested portal
+      if (redirectUrl && (
+        (redirectUrl.startsWith('/student') && (user.role === 'student' || user.role === 'admin')) ||
+        (redirectUrl.startsWith('/teacher') && (user.role === 'teacher' || user.role === 'admin')) ||
+        (redirectUrl.startsWith('/admin') && user.role === 'admin')
+      )) {
+        navigate(redirectUrl);
+        return;
+      }
+
+      if (user.role === 'student') {
+        navigate('/student');
+      } else if (user.role === 'teacher') {
+        navigate('/teacher');
+      } else if (user.role === 'admin') {
+        navigate('/admin');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please check credentials.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -80,6 +115,29 @@ export const Login: React.FC = () => {
             </button>
           </div>
 
+          {/* Session Notice / Access Error */}
+          {sessionNotice && !error && (
+            <div className="bg-primary/10 border border-primary/20 text-primary rounded-lg p-sm text-[13px] flex items-center gap-xs">
+              <Info className="w-4 h-4 shrink-0" />
+              <span>{sessionNotice}</span>
+            </div>
+          )}
+
+          {accessError && !error && (
+            <div className="bg-[#d97706]/10 border border-[#d97706]/20 text-[#d97706] rounded-lg p-sm text-[13px] flex items-center gap-xs">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{accessError}</span>
+            </div>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <div className="bg-error/10 border border-error/20 text-error rounded-lg p-sm text-[13px] flex items-center gap-xs">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-md">
             {/* Email Input */}
@@ -101,7 +159,6 @@ export const Login: React.FC = () => {
                       ? 'henderson@eduai.edu'
                       : 's.jenkins@eduai.edu'
                   }
-                  required
                   className="w-full pl-10 pr-sm py-[10px] border border-outline-variant/60 rounded-lg font-body text-[14px] leading-[20px] bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-outline-variant text-on-surface"
                 />
               </div>
@@ -120,7 +177,6 @@ export const Login: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  required
                   className="w-full pl-10 pr-sm py-[10px] border border-outline-variant/60 rounded-lg font-body text-[14px] leading-[20px] bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-outline-variant text-on-surface"
                 />
               </div>
@@ -146,10 +202,20 @@ export const Login: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-on-primary font-label text-[14px] leading-[20px] font-semibold py-[12px] rounded-lg mt-sm hover:bg-primary/90 transition-all shadow-sm active:scale-[0.98] flex justify-center items-center gap-xs cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-on-primary font-label text-[14px] leading-[20px] font-semibold py-[12px] rounded-lg mt-sm hover:bg-primary/90 transition-all shadow-sm active:scale-[0.98] flex justify-center items-center gap-xs cursor-pointer disabled:opacity-70"
             >
-              <span>Sign In as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}</span>
-              <ArrowRight className="w-4 h-4 shrink-0" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </>
+              )}
             </button>
           </form>
         </div>

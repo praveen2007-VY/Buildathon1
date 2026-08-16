@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, FileText, CheckCircle2 } from 'lucide-react';
 import { studentAssignmentsList } from '../../data/mockData';
 import { StudentAssignment } from '../../types';
+import { api } from '../../services/api';
 
 export const AdminAssignments: React.FC = () => {
-  const [assignments] = useState<StudentAssignment[]>(studentAssignmentsList);
+  const [assignments, setAssignments] = useState<StudentAssignment[]>(studentAssignmentsList);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+
+  useEffect(() => {
+    const loadAssignments = async () => {
+      try {
+        const res = await api.getAssignments();
+        if (res.assignments && res.assignments.length > 0) {
+          setAssignments(res.assignments);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadAssignments();
+  }, []);
 
   const filteredAssignments = assignments.filter((a) => {
     const matchesSearch = 

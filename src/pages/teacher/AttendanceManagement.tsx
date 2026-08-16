@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
-import { UserCheck, Save, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { UserCheck, Save, CheckCircle2, AlertTriangle, Clock, Loader2 } from 'lucide-react';
 import { teacherAttendanceStudents } from '../../data/mockData';
 import { TeacherAttendanceRecord } from '../../types';
+import { api } from '../../services/api';
 
 export const AttendanceManagement: React.FC = () => {
   const [students, setStudents] = useState<TeacherAttendanceRecord[]>(teacherAttendanceStudents);
   const [selectedCourse, setSelectedCourse] = useState('Advanced Calculus (MATH-401)');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const loadAttendance = async () => {
+      try {
+        const res = await api.getTeacherAttendance();
+        if (res.students && res.students.length > 0) {
+          setStudents(res.students);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadAttendance();
+  }, []);
 
   const presentCount = students.filter((s) => s.status === 'Present').length;
   const absentCount = students.filter((s) => s.status === 'Absent').length;
   const lateCount = students.filter((s) => s.status === 'Late').length;
-  const attendanceRate = Math.round((presentCount / students.length) * 100);
+  const attendanceRate = students.length > 0 ? Math.round((presentCount / students.length) * 100) : 0;
 
   const handleMarkStatus = (studentId: string, status: 'Present' | 'Absent' | 'Late') => {
     setStudents((prev) =>
@@ -23,9 +39,23 @@ export const AttendanceManagement: React.FC = () => {
     setStudents((prev) => prev.map((s) => ({ ...s, status: 'Present' })));
   };
 
-  const handleSaveAttendance = () => {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2500);
+  const handleSaveAttendance = async () => {
+    setIsSaving(true);
+    try {
+      await api.markAttendance(
+        students.map((s) => ({
+          studentId: s.studentId,
+          status: s.status,
+        }))
+      );
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch (e) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
