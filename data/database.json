@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "id": "std_1786875057318",
+      "name": "venkatesh",
+      "email": "venkat@gmail.com",
+      "password": "$2a$10$L5dYL1Cd0wdDDXtbPe3Z6.ZqsQ6j99zbwxHdk2EBvhLDS9XWRJnIy",
+      "role": "student",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "title": "Undergraduate Student",
+      "department": "School of Computing",
+      "studentId": "EDU-7759",
+      "semester": "Fall Semester 2024",
+      "createdAt": "2026-08-16T10:10:57.318Z"
+    },
+    {
+      "id": "tch_1786875153377",
+      "name": "praveen",
+      "email": "praveen@gmail.com",
+      "password": "$2a$10$jJl1icjMcZYpQiwoCC/MtOePs0BgSFPQmXumTIzEAk4KWXndIKQqu",
+      "role": "teacher",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "title": "Faculty Member",
+      "department": "Applied Sciences",
+      "employeeId": "TCH-836",
+      "createdAt": "2026-08-16T10:12:33.377Z"
+    }
+  ],
+  "courses": [],
+  "classes": [],
+  "assignments": [],
+  "submissions": [],
+  "attendance": [],
+  "teacherAttendanceRecords": [],
+  "exams": [],
+  "grades": [],
+  "teacherGrades": [],
+  "schedules": [],
+  "aiRecommendations": [],
+  "weakTopics": [],
+  "systemLogs": [
+    {
+      "id": "log_1786875057337",
+      "title": "New User Registered: venkatesh (student)",
+      "time": "Just now",
+      "source": "Registration Portal",
+      "type": "user",
+      "userRole": "student",
+      "action": "Register",
+      "module": "Authentication",
+      "status": "Success"
+    },
+    {
+      "id": "log_1786875153392",
+      "title": "New User Registered: praveen (teacher)",
+      "time": "Just now",
+      "source": "Registration Portal",
+      "type": "user",
+      "userRole": "teacher",
+      "action": "Register",
+      "module": "Authentication",
+      "status": "Success"
+    }
+  ],
+  "systemHealth": [],
+  "students": [
+    {
+      "id": "std_1786875057318",
+      "initials": "V",
+      "name": "venkatesh",
+      "studentId": "EDU-7759",
+      "department": "School of Computing",
+      "course": "CS-201",
+      "attendance": 100,
+      "performance": 85,
+      "riskLevel": "Low Risk",
+      "status": "Active",
+      "primaryIssue": "None"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "tch_1786875153377",
+      "name": "praveen",
+      "employeeId": "TCH-836",
+      "email": "praveen@gmail.com",
+      "department": "Applied Sciences",
+      "coursesCount": 1,
+      "studentsCount": 30,
+      "designation": "Faculty Instructor",
+      "status": "Active"
+    }
+  ]
+}

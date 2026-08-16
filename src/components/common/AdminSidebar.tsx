@@ -11,11 +11,11 @@ import {
   Award, 
   BarChart3, 
   Sparkles, 
-  Activity,
-  User as UserIcon,
-  LogOut
+  Activity, 
+  User as UserIcon, 
+  LogOut 
 } from 'lucide-react';
-import { currentUserAdmin } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
 
 interface AdminSidebarProps {
   isOpen?: boolean;
@@ -23,6 +23,7 @@ interface AdminSidebarProps {
 }
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClose }) => {
+  const { user } = useAuth();
   const adminNavItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { label: 'Students', path: '/admin/students', icon: Users },
@@ -112,17 +113,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClo
         <NavLink to="/admin/profile" className="flex items-center gap-3 overflow-hidden">
           <div className="w-9 h-9 rounded-full bg-surface-container-high overflow-hidden shrink-0">
             <img 
-              src={currentUserAdmin.avatar} 
-              alt={currentUserAdmin.name}
+              src={user?.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'} 
+              alt={user?.name || 'Admin'}
               className="w-full h-full object-cover" 
             />
           </div>
           <div className="min-w-0">
             <p className="font-body text-[13px] font-medium text-on-surface truncate">
-              {currentUserAdmin.name}
+              {user?.name || 'Administrator'}
             </p>
             <p className="font-label text-[11px] text-on-surface-variant truncate">
-              Super Admin
+              {user?.title || 'Super Admin'}
             </p>
           </div>
         </NavLink>

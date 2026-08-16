@@ -9,7 +9,6 @@ import { AdminLayout } from '../layouts/AdminLayout';
 
 // Public Pages
 import { Home } from '../pages/public/Home';
-import { Courses } from '../pages/public/Courses';
 import { CourseDetails } from '../pages/public/CourseDetails';
 import { Contact } from '../pages/public/Contact';
 import { Login } from '../pages/public/Login';
@@ -35,7 +34,6 @@ import { AttendanceManagement } from '../pages/teacher/AttendanceManagement';
 import { TeacherAssignments } from '../pages/teacher/TeacherAssignments';
 import { TeacherExams } from '../pages/teacher/TeacherExams';
 import { TeacherGrades } from '../pages/teacher/TeacherGrades';
-import { StudentPerformance } from '../pages/teacher/StudentPerformance';
 import { TeacherAIInsights } from '../pages/teacher/TeacherAIInsights';
 import { TeacherProfile } from '../pages/teacher/TeacherProfile';
 
@@ -53,6 +51,8 @@ import { AIInsights } from '../pages/admin/AIInsights';
 import { SystemMonitoring } from '../pages/admin/SystemMonitoring';
 import { AdminProfile } from '../pages/admin/AdminProfile';
 
+import { ProtectedRoute } from '../components/common/ProtectedRoute';
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -60,17 +60,26 @@ export const AppRouter: React.FC = () => {
         {/* Public Routes */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
-          <Route path="courses" element={<Courses />} />
-          <Route path="courses/:id" element={<CourseDetails />} />
+          {/* Direct legacy public course routes to protected student course hub */}
+          <Route path="courses" element={<Navigate to="/student/courses" replace />} />
+          <Route path="courses/:id" element={<Navigate to="/student/courses" replace />} />
           <Route path="contact" element={<Contact />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
 
         {/* Student Portal Routes */}
-        <Route path="/student" element={<StudentLayout />}>
+        <Route 
+          path="/student" 
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<StudentDashboard />} />
           <Route path="courses" element={<MyCourses />} />
+          <Route path="courses/:id" element={<CourseDetails />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="exams" element={<Exams />} />
@@ -82,7 +91,14 @@ export const AppRouter: React.FC = () => {
         </Route>
 
         {/* Teacher Portal Routes */}
-        <Route path="/teacher" element={<TeacherLayout />}>
+        <Route 
+          path="/teacher" 
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<TeacherDashboard />} />
           <Route path="courses" element={<TeacherCourses />} />
           <Route path="classes" element={<Classes />} />
@@ -90,13 +106,19 @@ export const AppRouter: React.FC = () => {
           <Route path="assignments" element={<TeacherAssignments />} />
           <Route path="exams" element={<TeacherExams />} />
           <Route path="grades" element={<TeacherGrades />} />
-          <Route path="students" element={<StudentPerformance />} />
           <Route path="ai" element={<TeacherAIInsights />} />
           <Route path="profile" element={<TeacherProfile />} />
         </Route>
 
         {/* Admin Portal Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<AdminDashboard />} />
           <Route path="students" element={<AdminStudents />} />
           <Route path="teachers" element={<AdminTeachers />} />

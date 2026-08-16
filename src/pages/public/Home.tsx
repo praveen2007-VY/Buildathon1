@@ -41,7 +41,7 @@ export const Home: React.FC = () => {
               <ArrowRight className="w-5 h-5 shrink-0" />
             </button>
             <button 
-              onClick={() => navigate('/courses')}
+              onClick={() => navigate('/student/courses')}
               className="px-lg py-md bg-surface text-on-surface border border-outline-variant rounded-lg font-title text-[18px] leading-[28px] font-semibold hover:bg-surface-container-low transition-colors flex justify-center items-center cursor-pointer"
             >
               Explore Courses
@@ -123,7 +123,7 @@ export const Home: React.FC = () => {
               <h2 className="font-headline text-[32px] font-bold text-on-surface mt-1">Featured Academic Courses</h2>
             </div>
             <button 
-              onClick={() => navigate('/courses')}
+              onClick={() => navigate('/student/courses')}
               className="text-primary font-label text-[14px] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>View All Courses</span>

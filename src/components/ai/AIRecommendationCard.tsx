@@ -1,12 +1,21 @@
 import React from 'react';
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { studentAIRecommendation } from '../../data/mockData';
 
 interface AIRecommendationCardProps {
   onViewInsights?: () => void;
 }
 
 export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ onViewInsights }) => {
+  const defaultRecommendation = {
+    targetSubject: 'Database Systems',
+    insightText: 'Take a diagnostic practice test on Relational Normalization & SQL Joins to benchmark your current score.',
+    recommendations: [
+      'Revise 3NF and Boyce-Codd Normal Form rules.',
+      'Practice INNER JOIN vs LEFT OUTER JOIN query patterns.'
+    ],
+    actionText: 'Take Practice Test'
+  };
+
   return (
     <div className="bg-inverse-on-surface rounded-xl p-md border border-secondary/30 shadow-floating relative overflow-hidden">
       {/* Background Sparkles Decors */}
@@ -25,8 +34,8 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ onVi
       {/* Insight Highlight Box */}
       <div className="bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg p-sm mb-md relative z-10 border border-outline-variant/30">
         <p className="font-body text-[14px] leading-[20px] text-on-surface">
-          <strong className="text-error font-semibold">Insight:</strong>{' '}
-          {studentAIRecommendation.insightText}
+          <strong className="text-primary font-semibold">Diagnostic:</strong>{' '}
+          {defaultRecommendation.insightText}
         </p>
       </div>
 
@@ -36,7 +45,7 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ onVi
           Recommendations
         </h4>
         <ul className="font-body text-[14px] leading-[20px] text-on-surface list-disc pl-md space-y-1">
-          {studentAIRecommendation.recommendations.map((rec, index) => (
+          {defaultRecommendation.recommendations.map((rec, index) => (
             <li key={index}>{rec}</li>
           ))}
         </ul>
@@ -45,9 +54,9 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ onVi
       {/* Action Button */}
       <button 
         onClick={onViewInsights}
-        className="w-full bg-secondary text-on-secondary font-label text-[12px] leading-[16px] font-semibold py-sm rounded-DEFAULT hover:bg-secondary-container transition-colors relative z-10 flex items-center justify-center gap-2 shadow-sm"
+        className="w-full bg-secondary text-on-secondary font-label text-[12px] leading-[16px] font-semibold py-sm rounded-lg hover:bg-secondary-container transition-colors relative z-10 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
       >
-        <span>{studentAIRecommendation.actionText}</span>
+        <span>{defaultRecommendation.actionText}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
     </div>

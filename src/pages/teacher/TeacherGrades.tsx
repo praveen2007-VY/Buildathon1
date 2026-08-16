@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
-import { Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Save, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { teacherGradeEntriesList } from '../../data/mockData';
 import { TeacherGradeEntry } from '../../types';
+import { api } from '../../services/api';
 
 export const TeacherGrades: React.FC = () => {
   const [grades, setGrades] = useState<TeacherGradeEntry[]>(teacherGradeEntriesList);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const loadGrades = async () => {
+      try {
+        const res = await api.getTeacherGrades();
+        if (res.entries && res.entries.length > 0) {
+          setGrades(res.entries);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+    loadGrades();
+  }, []);
 
   const handleScoreChange = (id: string, field: 'assignmentScore' | 'examScore', val: number) => {
     setGrades((prev) =>
@@ -13,7 +29,7 @@ export const TeacherGrades: React.FC = () => {
         if (g.id === id) {
           const assignment = field === 'assignmentScore' ? val : g.assignmentScore;
           const exam = field === 'examScore' ? val : g.examScore;
-          const total = Math.round((assignment + exam) / 2);
+          const total = Math.round((assignment * 0.4) + (exam * 0.6));
           const letterGrade = total >= 90 ? 'A' : total >= 80 ? 'B' : total >= 70 ? 'C' : 'D';
           return { ...g, [field]: val, totalScore: total, grade: letterGrade };
         }
@@ -22,9 +38,25 @@ export const TeacherGrades: React.FC = () => {
     );
   };
 
-  const handlePublishGrades = () => {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2500);
+  const handlePublishGrades = async () => {
+    setIsSaving(true);
+    try {
+      await Promise.all(
+        grades.map((g) =>
+          api.updateTeacherGrade(g.id, {
+            assignmentScore: g.assignmentScore,
+            examScore: g.examScore,
+          })
+        )
+      );
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch (e) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

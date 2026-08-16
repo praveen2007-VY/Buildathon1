@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { User as UserIcon, Mail, Phone, BookOpen, Shield, Edit3, Save, X, CheckCircle2 } from 'lucide-react';
-import { currentUserStudent } from '../../data/mockData';
+import { Edit3, Save, X, CheckCircle2, User as UserIcon } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const Profile: React.FC = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUserStudent.name);
-  const [email, setEmail] = useState(currentUserStudent.email);
-  const [phone, setPhone] = useState(currentUserStudent.phone || '+1 (555) 234-5678');
+  const [name, setName] = useState(user?.name || 'Student User');
+  const [email, setEmail] = useState(user?.email || 'student@eduai.edu');
+  const [phone, setPhone] = useState('+1 (555) 234-5678');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    updateUser({ name, email });
     setIsEditing(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -66,23 +68,21 @@ export const Profile: React.FC = () => {
 
       {/* Main Avatar & General Info Card */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card flex flex-col md:flex-row items-center md:items-start gap-lg">
-        <img 
-          src={currentUserStudent.avatar} 
-          alt={currentUserStudent.name} 
-          className="w-24 h-24 rounded-full object-cover border-4 border-surface-container-high shadow-md shrink-0"
-        />
+        <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center border-4 border-surface-container-high shadow-md shrink-0 font-bold text-[32px]">
+          {name.charAt(0).toUpperCase()}
+        </div>
 
         <div className="flex-1 space-y-xs text-center md:text-left">
           <span className="px-3 py-1 bg-primary/10 text-primary font-label text-[11px] font-bold rounded-full uppercase">
             Active Student
           </span>
           <h3 className="font-headline text-[24px] font-bold text-on-surface mt-1">{name}</h3>
-          <p className="font-body text-[14px] text-on-surface-variant">{currentUserStudent.title}</p>
-          <p className="font-label text-[12px] text-outline font-medium">Student ID: {currentUserStudent.studentId}</p>
+          <p className="font-body text-[14px] text-on-surface-variant">{email}</p>
+          <p className="font-label text-[12px] text-outline font-medium">Student Account ID: {user?.id || 'std_active'}</p>
         </div>
       </div>
 
-      {/* Profile Details Form / View */}
+      {/* Profile Details Form */}
       <form onSubmit={handleSave} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-lg shadow-card space-y-md">
         <h3 className="font-title text-[18px] font-bold text-on-surface pb-sm border-b border-outline-variant/20">
           Personal Information
@@ -127,7 +127,7 @@ export const Profile: React.FC = () => {
             <input 
               type="text"
               disabled
-              value={currentUserStudent.department}
+              value={user?.department || 'Computer Science'}
               className="w-full p-2.5 bg-surface-container-low/50 border border-outline-variant/30 rounded-lg text-[14px] text-on-surface-variant cursor-not-allowed"
             />
           </div>
@@ -139,13 +139,13 @@ export const Profile: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-md text-[14px]">
           <div className="p-md rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-1">
-            <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Current Semester</p>
-            <p className="font-body font-bold text-on-surface">{currentUserStudent.semester}</p>
+            <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Academic Status</p>
+            <p className="font-body font-bold text-on-surface">Registered Student</p>
           </div>
 
           <div className="p-md rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-1">
-            <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Academic Advisor</p>
-            <p className="font-body font-bold text-on-surface">Prof. Henderson (Senior Advisor)</p>
+            <p className="font-label text-[12px] text-on-surface-variant uppercase font-semibold">Account Role</p>
+            <p className="font-body font-bold text-on-surface">Student Portal User</p>
           </div>
         </div>
       </form>

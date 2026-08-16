@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const Register: React.FC = () => {
   const [role, setRole] = useState<'student' | 'teacher'>('student');
@@ -9,14 +10,32 @@ export const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (role === 'student') {
-      navigate('/student');
-    } else {
-      navigate('/teacher');
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const user = await register(fullName, email, password, role);
+      if (user.role === 'student') {
+        navigate('/student');
+      } else {
+        navigate('/teacher');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -64,6 +83,14 @@ export const Register: React.FC = () => {
               Teacher Account
             </button>
           </div>
+
+          {/* Error banner */}
+          {error && (
+            <div className="bg-error/10 border border-error/20 text-error rounded-lg p-sm text-[13px] flex items-center gap-xs">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
           <form onSubmit={handleRegister} className="flex flex-col gap-md">
             {/* Full Name */}
@@ -123,7 +150,7 @@ export const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 text-outline-variant hover:text-on-surface"
+                  className="absolute right-3 text-outline-variant hover:text-on-surface cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -152,10 +179,20 @@ export const Register: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-on-primary font-label text-[14px] font-semibold py-[12px] rounded-lg mt-sm hover:bg-primary/90 transition-all shadow-sm flex justify-center items-center gap-xs cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-on-primary font-label text-[14px] font-semibold py-[12px] rounded-lg mt-sm hover:bg-primary/90 transition-all shadow-sm flex justify-center items-center gap-xs cursor-pointer disabled:opacity-70"
             >
-              <span>Create {role === 'student' ? 'Student' : 'Teacher'} Account</span>
-              <ArrowRight className="w-4 h-4 shrink-0" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create {role === 'student' ? 'Student' : 'Teacher'} Account</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </>
+              )}
             </button>
           </form>
         </div>
